@@ -8,21 +8,24 @@
 # - run as cronjob, producing no output (version 1.2)
 # - cleaner flow, less external calls, small bugfix (1.3)
 # - do not act upon 'efi.signed' kernels (1.4)
+# - do not eval tput's if no tty (1.5)
 
 echo_if_tty () { if [[ -t 1 ]]; then echo "$@"; fi }
 
-# Text color variables
-rst=$(tput sgr0)	# Reset
-red=$(tput setaf 1)
-green=$(tput setaf 2)
-yellow=$(tput setaf 3)
-blue=$(tput setaf 4)
-purple=$(tput setaf 5)
-cyan=$(tput setaf 6)
-white=$(tput setaf 7)
-# options:
-bold=$(tput bold)
-underline=$(tput sgr 0 1)
+if [[ -t 1 ]]; then
+  # Text color variables
+  rst=$(tput sgr0)	# Reset
+  red=$(tput setaf 1)
+  green=$(tput setaf 2)
+  yellow=$(tput setaf 3)
+  blue=$(tput setaf 4)
+  purple=$(tput setaf 5)
+  cyan=$(tput setaf 6)
+  white=$(tput setaf 7)
+  # options:
+  bold=$(tput bold)
+  underline=$(tput sgr 0 1)
+fi
 
 pushd /boot &>/dev/null || exit $?
 INSTALLED_KERNELS=$(ls --color=never -1r vmlinuz-* | grep -v efi.signed$)
