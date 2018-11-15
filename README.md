@@ -6,4 +6,4 @@ Quick script for cleaning old Debian/Ubuntu-based stash of installed kernel pack
 * other (outdated) kernels.
 
 Original code by Julien Moreau AKA PixEye, origin was here:  
-[http://stoilis.wordpress.com/2010/06/18/automatically-remove-old-kernels-from-debian-based-distributions/] (http://stoilis.wordpress.com/2010/06/18/automatically-remove-old-kernels-from-debian-based-distributions/).
+[http://stoilis.wordpress.com/2010/06/18/automatically-remove-old-kernels-from-debian-based-distributions/](http://stoilis.wordpress.com/2010/06/18/automatically-remove-old-kernels-from-debian-based-distributions/).
