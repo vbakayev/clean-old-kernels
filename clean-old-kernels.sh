@@ -7,6 +7,7 @@
 # - not ask any questions - with "-y" option (version 1.1)
 # - run as cronjob, producing no output (version 1.2)
 # - cleaner flow, less external calls, small bugfix (1.3)
+# - do not act upon 'efi.signed' kernels (1.4)
 
 echo_if_tty () { if [[ -t 1 ]]; then echo "$@"; fi }
 
@@ -24,12 +25,12 @@ bold=$(tput bold)
 underline=$(tput sgr 0 1)
 
 pushd /boot &>/dev/null || exit $?
-INSTALLED_KERNELS=$(ls --color=never -1r vmlinuz-*)
+INSTALLED_KERNELS=$(ls --color=never -1r vmlinuz-* | grep -v efi.signed$)
 NUMBER_OF_INSTALLED_KERNELS=$(echo ${INSTALLED_KERNELS} | wc -w)
 NUMBER_OF_KERNELS_TO_KEEP=2
-LAST_INSTALLED_KERNEL=$(ls --color=never -1 vmlinuz-* | tail -n 1)
+LAST_INSTALLED_KERNEL=$(ls --color=never -1 vmlinuz-* | grep -v efi.signed$ | tail -n 1)
 CURRENT_VERSION=$(uname -r)
-RUNNING_KERNEL=$(ls --color=never -1 vmlinuz-$(uname -r))
+RUNNING_KERNEL=$(ls --color=never -1 vmlinuz-$(uname -r) | grep -v efi.signed$)
 popd &>/dev/null
 
 if [ "${RUNNING_KERNEL}" != "${LAST_INSTALLED_KERNEL}" ]; then
@@ -50,7 +51,7 @@ do
   if [ "${k}" == "${RUNNING_KERNEL}" ]; then continue; fi # do not remove running kernel
 
   k="$(echo ${k##vmlinuz-} | cut -d- -f-2)"
-  # echo_if_tty "k='$k'"  # for debug
+  # echo_if_tty "k_rm='$k'"  # for debug
 
   if [ "${REMOVE_PATTERN}" == '' ]; then
     REMOVE_PATTERN="${k}"
@@ -69,5 +70,5 @@ if [ "${LOGNAME}" != "root" ]; then
   echo_if_tty -e "${bold}${red}I need root privileges in order to clean!${rst}" ; exit 2
 fi
 
-REMOVE_PACKAGES=$(dpkg -l linux-\* | awk "/${REMOVE_PATTERN}/ {print \$2}")
+REMOVE_PACKAGES=$(dpkg -l | awk "/linux-.*-${REMOVE_PATTERN}/ {print \$2}")
 apt-get purge ${1} ${REMOVE_PACKAGES}
